@@ -1,2 +1,4 @@
 flask
-guincorn
+gunicorn
+PyPDF2
+reportlab
