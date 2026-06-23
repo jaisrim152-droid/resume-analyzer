@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Resume Analyzer Result</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        body{
+            font-family:'Poppins',sans-serif;
+            background:radial-gradient(circle at top, #1e293b, #0f172a);
+            color:white;
+            padding:20px;
+        }
+
+        h1{
+            text-align:center;
+            margin-bottom:25px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+            transition: all 0.3s ease;
+}
+
+        .card:hover{
+            transform:translateY(-3px);
+            box-shadow:0 10px 25px rgba(56,189,248,.3);
+        }
+
+        .good{color:#22c55e;font-weight:bold;}
+        .average{color:#facc15;font-weight:bold;}
+        .weak{color:#ef4444;font-weight:bold;}
+
+        .progress-container{
+            width:100%;
+            height:22px;
+            background:#334155;
+            border-radius:20px;
+            overflow:hidden;
+            margin-top:15px;
+        }
+
+        .progress-bar{
+            height:22px;
+            background:linear-gradient(to right,#22c55e,#38bdf8);
+            text-align:center;
+            line-height:22px;
+            font-size:12px;
+            font-weight:bold;
+            color:white;
+        }
+
+        .bar{
+            width:100%;
+            height:20px;
+            background:#334155;
+            border-radius:20px;
+            overflow:hidden;
+            margin-bottom:15px;
+        }
+
+        .fill{
+            height:20px;
+            background:linear-gradient(to right,#38bdf8,#22c55e);
+            text-align:center;
+            line-height:20px;
+            color:white;
+            font-size:12px;
+            font-weight:bold;
+        }
+
+        .skill-badge{
+            display:inline-block;
+            background:#10b981;
+            padding:8px 14px;
+            margin:5px;
+            border-radius:20px;
+            font-size:14px;
+            font-weight:bold;
+        }
+
+        .missing-badge{
+            display:inline-block;
+            background:#ef4444;
+            padding:8px 14px;
+            margin:5px;
+            border-radius:20px;
+            font-size:14px;
+            font-weight:bold;
+        }
+
+        button{
+            background:#38bdf8;
+            color:white;
+            border:none;
+            padding:12px 20px;
+            border-radius:10px;
+            cursor:pointer;
+            font-size:16px;
+        }
+
+        button:hover{
+            background:#0ea5e9;
+        }
+
+        pre{
+            white-space:pre-wrap;
+            color:white;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="card" style="text-align:center;">
+
+<svg width="180" height="180">
+
+  <!-- background circle -->
+  <circle cx="90" cy="90" r="70"
+    stroke="#334155"
+    stroke-width="15"
+    fill="none" />
+
+  <!-- progress circle -->
+  <circle cx="90" cy="90" r="70"
+    stroke="#38bdf8"
+    stroke-width="15"
+    fill="none"
+    stroke-dasharray="440"
+    stroke-dashoffset="{{ 440 - (score * 4.4) }}"
+    stroke-linecap="round"
+    transform="rotate(-90 90 90)" />
+
+  <!-- text -->
+  <text x="90" y="95"
+    text-anchor="middle"
+    fill="white"
+    font-size="22"
+    font-weight="bold">
+    {{ score }}%
+  </text>
+
+</svg>
+
+<h3>ATS Score</h3>
+
+</div>
+
+<div class="card">
+    <h3>📁 Uploaded Resume</h3>
+    <p>{{ filename }}</p>
+</div>
+
+<div class="card">
+
+<h2>ATS Score : {{ score }}/100</h2>
+
+{% if score >= 75 %}
+<p class="good">🔥 Excellent ATS Score</p>
+
+{% elif score >= 40 %}
+<p class="average">⚡ Average ATS Score</p>
+
+{% else %}
+<p class="weak">⚠ Poor ATS Score</p>
+
+{% endif %}
+
+<div style="font-size:28px;margin-top:10px;">
+
+{% if score >=90 %}
+⭐⭐⭐⭐⭐
+
+{% elif score >=70 %}
+⭐⭐⭐⭐
+
+{% elif score >=50 %}
+⭐⭐⭐
+
+{% elif score >=30 %}
+⭐⭐
+
+{% else %}
+⭐
+
+{% endif %}
+
+</div>
+
+<div class="progress-container">
+<div class="progress-bar" style="width:{{ score }}%">
+{{ score }}%
+</div>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>📊 ATS Score Breakdown</h3>
+
+<p>Skills Match</p>
+<div class="bar">
+<div class="fill" style="width:{{ (breakdown['Skills']/30)*100 }}%">
+{{ ((breakdown['Skills']/30)*100)|round(0) }}%
+</div>
+</div>
+
+<p>Projects</p>
+<div class="bar">
+<div class="fill" style="width:{{ (breakdown['Projects']/20)*100 }}%">
+{{ ((breakdown['Projects']/20)*100)|round(0) }}%
+</div>
+</div>
+
+<p>Education</p>
+<div class="bar">
+<div class="fill" style="width:{{ (breakdown['Education']/15)*100 }}%">
+{{ ((breakdown['Education']/15)*100)|round(0) }}%
+</div>
+</div>
+
+<p>Experience</p>
+<div class="bar">
+<div class="fill" style="width:{{ (breakdown['Experience']/15)*100 }}%">
+{{ ((breakdown['Experience']/15)*100)|round(0) }}%
+</div>
+</div>
+
+<p>Certifications</p>
+<div class="bar">
+<div class="fill" style="width:{{ (breakdown['Certifications']/10)*100 }}%">
+{{ ((breakdown['Certifications']/10)*100)|round(0) }}%
+</div>
+</div>
+
+</div>
+
+<div class="card">
+<h3>⭐ Resume Rating</h3>
+<p>{{ rating }}/5 ⭐</p>
+</div>
+
+<div class="card">
+
+<h3>🛠 Skills Detected</h3>
+
+{% if skills %}
+
+{% for skill in skills %}
+<span class="skill-badge">{{ skill }}</span>
+{% endfor %}
+
+{% else %}
+
+<p>No technical skills detected.</p>
+
+{% endif %}
+
+</div>
+
+
+
+<div class="card">
+
+<h3>🤖 AI Professional Summary</h3>
+
+<p>{{ summary }}</p>
+
+</div>
+<!-- STRENGTHS -->
+<div class="card">
+    <h3>💪 Strengths</h3>
+
+    {% if strengths %}
+        {% for item in strengths %}
+            <p>✔ {{ item }}</p>
+        {% endfor %}
+    {% else %}
+        <p>✔ Resume uploaded successfully.</p>
+        <p>✔ Good resume structure detected.</p>
+    {% endif %}
+</div>
+
+<!-- IMPROVEMENTS -->
+<div class="card">
+    <h3>📈 Improvements</h3>
+
+    {% if improvements %}
+        {% for item in improvements %}
+            <p>⚠ {{ item }}</p>
+        {% endfor %}
+    {% else %}
+        <p>⚠ Improve your technical skills.</p>
+        <p>⚠ Add more real-world projects.</p>
+        <p>⚠ Include internship experience.</p>
+        <p>⚠ Keep your resume updated.</p>
+    {% endif %}
+</div>
+
+<!-- SUGGESTIONS -->
+<div class="card">
+    <h3>💡 Suggestions</h3>
+
+    {% if suggestions %}
+        {% for item in suggestions %}
+            <p>👉 {{ item }}</p>
+        {% endfor %}
+    {% else %}
+        <p>👉 Customize your resume for each job.</p>
+        <p>👉 Add GitHub and LinkedIn profile.</p>
+        <p>👉 Include certifications.</p>
+        <p>👉 Highlight achievements using numbers.</p>
+        <p>👉 Proofread before applying.</p>
+    {% endif %}
+</div>
+
+<!-- RESUME CONTENT -->
+<div class="card">
+    <h3>📄 Resume Content</h3>
+
+    {% if resume_text %}
+        <pre>{{ resume_text }}</pre>
+    {% else %}
+        <p>No resume content extracted.</p>
+    {% endif %}
+</div>
+
+<!-- DOWNLOAD REPORT -->
+<div class="card" style="text-align:center;">
+    <h3>📥 Download PDF Report</h3>
+
+    <p>Your resume analysis report is ready.</p>
+
+    <a href="/download">
+        <button>Download PDF Report</button>
+    </a>
+</div>
+
+</body>
+</html>
